@@ -1,6 +1,7 @@
 struct table{
 	char grid[10][10];
 	int view[10][10];
+	int laser = 1;
 };
 
 struct coords{
@@ -11,11 +12,14 @@ struct ships{
 	coords B[2], C[3], D[4];
 };
 
-table player1_turn(table player2);
-table player2_turn(table player1);
-int check(table player1, table player2);
-/*table createboard1(table player1);
-table createboard2(table player2);*/
-void show(table player1, table player2);
-void show1(int x, table player1);
-void show2(int x, table player2);
+table checklocation(table user, int x, int y, int orientation, int size);
+table createboard_player(table player);
+table createboard_automatic(table computer);
+
+int check(table *player, int n);
+void show(table *player, int n);
+
+table player1_attack(table player2);
+
+int select_enemy(table *player, int n, int self);
+table computer_turn(table enemy);
