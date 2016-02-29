@@ -203,6 +203,13 @@ table createboard_automatic(table computer, int sizex, int sizey){
 	srand(time(NULL));
 	int x, y;
 
+	for (x = 0; x < sizex; x++){
+		for (y = 0; y < sizey; y++){
+			computer.grid[x][y] = '~';
+			computer.view[x][y] = 0;
+		}
+	}
+
 	x = rand() % sizex;
 	y = rand() % sizey;
 
@@ -211,9 +218,29 @@ table createboard_automatic(table computer, int sizex, int sizey){
 	x = rand() % 10;
 	y = rand() % 10;
 
+	while (computer.grid[x][y] != '~' || ((x + 1)<sizex && (y + 1)<sizey && (x - 1) >= 0 && (y - 1) >= 0) || (computer.grid[x + 1][y] != '~' && computer.grid[x - 1][y] != '~' && computer.grid[x][y + 1] == '~' && computer.grid[x][y - 1] == '~')){
+		x = rand() % 10;
+		y = rand() % 10;
+	}
 
+	if (computer.grid[x + 1][y] == '~'){
+		computer.grid[x][y] = 'B';
+		computer.grid[x+1][y] = 'B';
+	}
+	else if (computer.grid[x][y + 1] == '~'){
+		computer.grid[x][y] = 'B';
+		computer.grid[x][y + 1] = 'B';
+	}
+	else if (computer.grid[x - 1][y] == '~'){
+		computer.grid[x][y] = 'B';
+		computer.grid[x - 1][y] = 'B';
+	}
+	else {
+		computer.grid[x][y] = 'B';
+		computer.grid[x][y - 1] = 'B';
+	}
 
-	while (computer.grid[x][y] != '~' || ((x + 2)<sizex && (y + 2)<sizey && (x - 2) >= 0 && (y - 2) >= 0) || ((computer.grid[x + 1][y] != '~' || computer.grid[x + 2][y] != '~') && (computer.grid[x - 1][y] != '~' || computer.grid[x - 2][y] == 'A') && (computer.grid[x][y + 1] == 'A' || computer.grid[x][y + 2] == 'A') && (computer.grid[x][y - 1] == 'A' || computer.grid[x][y - 2] == 'A'))){
+	while (computer.grid[x][y] != '~' || ((x + 2)<sizex && (y + 2)<sizey && (x - 2) >= 0 && (y - 2) >= 0) || ((computer.grid[x + 1][y] != '~' || computer.grid[x + 2][y] != '~') && (computer.grid[x - 1][y] != '~' || computer.grid[x - 2][y] != '~') && (computer.grid[x][y + 1] != '~' || computer.grid[x][y + 2] != '~') && (computer.grid[x][y - 1] != '~' || computer.grid[x][y - 2] != '~'))){
 		x = rand() % 10;
 		y = rand() % 10;
 	}
