@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-table player1_attack(table computer){
+table player1_attack(table computer, int sizex, int sizey){
 	int x, y, aux = 0;
 	char ship;
 	printf("\nIntroduce coordinates captain:\n");
@@ -66,7 +66,7 @@ table player1_attack(table computer){
 	return computer;
 }
 
-int check (table *player, int n){
+int check(table *player, int n, int sizex, int sizey){
 	int x, y, p1 = 0, p2 = 0, aux;
 	int *winner = (int*)malloc(sizeof(int)*n);
 
@@ -89,7 +89,7 @@ int check (table *player, int n){
 	return ((p1 == 10) || (p2 == 10));
 }
 
-void show(table *player, int n){
+void show(table *player, int n, int sizex, int sizey){
 	int x, y, aux = 0;
 	
 	while (aux < n){
@@ -167,7 +167,7 @@ void show(table *player, int n){
 	}
 }
 
-table createboard_player(table player){
+/*table createboard_player(table player, int sizex, int sizey){
 	int x, y, orientation = 1;
 
 	printf("Where do you want to place ship A (size 1)?\n");
@@ -197,21 +197,23 @@ table createboard_player(table player){
 	player = checklocation(player, x, y, orientation, 4);
 	
 	return player;
-}
+}*/
 
-table createboard_automatic(table computer){
+table createboard_automatic(table computer, int sizex, int sizey){
 	srand(time(NULL));
 	int x, y;
 
-	x = rand() % 10;
-	y = rand() % 10;
+	x = rand() % sizex;
+	y = rand() % sizey;
 
 	computer.grid[x][y] = 'A';
 
 	x = rand() % 10;
 	y = rand() % 10;
 
-	while (computer.grid[x][y] == 'A' || ((x + 2)<10 && (y + 2)<10 && (x - 2) >= 0 && (y - 2) >= 0) || ((computer.grid[x + 1][y] == 'A' || computer.grid[x + 2][y] == 'A') && (computer.grid[x - 1][y] == 'A' || computer.grid[x - 2][y] == 'A') && (computer.grid[x][y + 1] == 'A' || computer.grid[x][y + 2] == 'A') && (computer.grid[x][y - 1] == 'A' || computer.grid[x][y - 2] == 'A'))){
+
+
+	while (computer.grid[x][y] != '~' || ((x + 2)<sizex && (y + 2)<sizey && (x - 2) >= 0 && (y - 2) >= 0) || ((computer.grid[x + 1][y] != '~' || computer.grid[x + 2][y] != '~') && (computer.grid[x - 1][y] != '~' || computer.grid[x - 2][y] == 'A') && (computer.grid[x][y + 1] == 'A' || computer.grid[x][y + 2] == 'A') && (computer.grid[x][y - 1] == 'A' || computer.grid[x][y - 2] == 'A'))){
 		x = rand() % 10;
 		y = rand() % 10;
 	}
@@ -220,7 +222,7 @@ table createboard_automatic(table computer){
 	return computer;
 }
 
-table checklocation(table user, int x, int y, int orientation, int size){
+table checklocation(table user, int x, int y, int orientation, int size, int sizex, int sizey){
 	int aux_x, aux_y;
 
 	if (orientation == 1){
@@ -228,4 +230,73 @@ table checklocation(table user, int x, int y, int orientation, int size){
 	}
 
 	return user;
+}
+
+table *preparelaser(table *player, int sizex, int sizey, int n){
+	int x, y, aux = 0, nplayers;
+	char option;
+	int cols = (sizey * 2);
+	int rows = (sizex % n) + (sizex / n);
+
+	printf("Do we fire to the row or the column?\n");
+	printf("  a. Row\n");
+	printf("  b. Column\n");
+	option = getchar();
+
+	switch (option){
+	case 'a':
+		printf("\nPlease introduce the desired row (0 - %d)\n", cols - 1);
+		scanf_s("%d", &y);
+
+		while (y > rows){
+			printf("\nThat's outside our range (0 - %d)\n", cols - 1);
+			scanf_s("%d", &y);
+		}
+
+		while (rows > sizey){
+			aux++;
+			cols -= sizey;
+		}
+
+		for (x = 0; x < sizex; x++){
+			player[aux].view[x][y] = 1;
+			player[aux+1].view[x][y] = 1;
+		}
+
+		break;
+	default:
+		printf("\nPlease introduce the desired column (0 - %d)\n", cols-1);
+		scanf_s("%d", &x);
+
+		while (x > cols){
+			printf("\nThat's outside our range (0 - %d)\n", cols-1);
+			scanf_s("%d", &x);
+		}
+
+		while (cols > sizex){
+			aux++;
+			cols -= sizex;
+		}
+
+		if (aux == 0){
+			for (int aux2 = 0; aux2 < n; aux2++){
+				if (aux2 % 2 == 0){
+					for (y = 0; y < sizex; y++){
+						player[aux2].view[x][y] = 1;
+					}
+				}
+			}
+		}
+		else{
+			for (int aux2 = 0; aux2 < n; aux2++){
+				if (aux2 % 2 != 0){
+					for (y = 0; y < sizex; y++){
+						player[aux2].view[x][y] = 1;
+					}
+				}
+			}
+		}
+	}
+
+	return player;
 }

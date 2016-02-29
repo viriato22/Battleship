@@ -4,8 +4,9 @@
 
 int main() {
 	short counter, winner = 0;
-	int x, y, n, aux, surrender = 0, sel;
-	char action;
+	int x, y, n, aux, aux2, sel;
+	int sizex, sizey;
+	char action, weapon;
 	
 	printf("Introduce number of players:\n");
 	scanf_s("%d", &n);
@@ -15,10 +16,26 @@ int main() {
 	if (n == 0){
 		printf("No players means no game\n");
 	}
+	else if (n == 1){
+		printf("Don't play by yourself\n");
+	}
 	else {
+		printf("Introduce the height and width of the board\n");
+		scanf_s("%d %d", &sizex, &sizey);
+
+		for (aux = 0; aux < n; aux++){
+			player[aux].grid = (char**)malloc(sizeof(char)*(sizex));
+			player[aux].view = (int**)malloc(sizeof(int)*(sizex));
+			for (aux2 = 0; aux2 < sizex; aux2++){
+				player[aux].grid[aux2] = (char*)malloc(sizeof(char)*(sizey));
+				player[aux].view[aux2] = (int*)malloc(sizeof(int)*(sizey));
+			}
+		}
+
 		//Defined assignation
-		for (x = 0; x < 10; x++){
-			for (y = 0; y < 10; y++){
+		
+		for (x = 0; x < sizex; x++){
+			for (y = 0; y < sizey; y++){
 				for (aux = 0; aux < n; aux++){
 					if (x == 1 && y == 1){
 						player[aux].grid[x][y] = 'A';
@@ -39,12 +56,19 @@ int main() {
 				}
 			}
 		}
+		
+		// Rand asignation
+		/*
+		for (aux = 0; aux < n; aux++){
+			player[aux] = createboard_automatic(player[aux], sizex, sizey);
+		}
+		*/
 
 		for (counter = 0; winner == 0; counter++){
-			if (counter%n == 0 && surrender != 1){
+			if (counter%n == 0 && player[0].lost != 1){
 				printf("                        Turn #%d:\n", counter / n);
 
-				show(player, n);
+				show(player, n, sizex, sizey);
 
 			tryagain:
 
@@ -69,24 +93,38 @@ int main() {
 						scanf_s("%d", &aux);
 					}
 
-					player[aux] = player1_attack(player[aux]);
+					player[aux] = player1_attack(player[aux], sizex, sizey);
 					break;
 				case 'b':
+					printf("Select special weapon:\n");
+					printf("  a. Laser\n");
+					printf("  b. Cancel\n");
+					weapon = getchar();
+					
+					switch (weapon){
+					case 'a':
+						player[0].laser--;
+						player = preparelaser(player, sizex, sizey, n);
+						break;
+					default:
+						goto tryagain;
+					}
+
 					break;
 				case 'c':
-					surrender = 1;
+					player[0].lost = 1;
 					break;
 				default:
 					printf("We don't understand that order.\n\n");
 					goto tryagain;
 				}
 			}
-			else{
-				sel = select_enemy(player, n, counter%n);
-				player[sel] = computer_turn(player[sel]);
+			else if(player[counter%n].lost != 1){
+				sel = select_enemy(player, n, counter%n, sizex, sizey);
+				player[sel] = computer_turn(player[sel], sizex, sizey);
 			}
 
-			winner = check(player, n);
+			winner = check(player, n, sizex, sizey);
 		}
 
 		printf("\nThe Winner is:");

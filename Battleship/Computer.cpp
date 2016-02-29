@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-int select_enemy(table *player, int n, int self){	
+int select_enemy(table *player, int n, int self, int sizex, int sizey){
 	srand(time(NULL));
 	int target;
 
@@ -25,14 +25,14 @@ int select_enemy(table *player, int n, int self){
 }
 
 
-table computer_turn(table enemy){
+table computer_turn(table enemy, int sizex, int sizey){
 	short x, y, nB = 0, nC = 0, nD = 0, x1, y1, x2, y2, aux = 0;
 	char ship;
 	ships enemy_ships;
 	srand(time(NULL));
 
-	for (x = 0; x < 10; x++){
-		for (y = 0; y < 10; y++){
+	for (x = 0; x < sizex; x++){
+		for (y = 0; y < sizey; y++){
 			if (enemy.grid[x][y] == 'B' && enemy.view[x][y] == '1'){
 				enemy_ships.B[nB].x = x;
 				enemy_ships.B[nB].y = y;
